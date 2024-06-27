@@ -1,7 +1,9 @@
 # Created by .ignore support plugin (hsz.mobi)
 
-./addons/**
-./repos/**
+addons/**
+repos/**
+!repos/.gitkeep
+!repos/.gitignore
 
 
 ### Python template
