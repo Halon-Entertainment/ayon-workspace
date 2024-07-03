@@ -17,6 +17,7 @@ ADDON_REPOSITORIES = [
     "ayon-maya-toolkit",
     "ayon-webhook",
     "ayon-zbrush",
+    "ayon-flow-sync",
 ]
 
 ROOT_PATH = pathlib.Path(__file__).parent.resolve()
@@ -36,9 +37,7 @@ def get_repository(repository_name, path):
         return
     full_path.parent.mkdir(parents=True, exist_ok=True)
 
-    git_command = (
-        f"git clone {GIT_URL}{repository_name}.git {full_path.as_posix()}"
-    )
+    git_command = f"git clone {GIT_URL}{repository_name}.git {full_path.as_posix()}"
     subprocess.call(git_command, shell=True)
 
 

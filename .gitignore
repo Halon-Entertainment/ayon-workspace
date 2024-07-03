@@ -11,6 +11,7 @@ repos/**
 __pycache__/
 *.py[cod]
 *$py.class
+poetry.lock
 
 # Mac Stuff
 ###########
