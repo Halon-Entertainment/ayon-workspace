@@ -2,6 +2,7 @@
 
 addons/**
 repos/**
+tools/**
 !repos/.gitkeep
 !repos/.gitignore
 
