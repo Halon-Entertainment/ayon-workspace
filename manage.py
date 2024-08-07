@@ -20,6 +20,14 @@ ADDON_REPOSITORIES = [
     "ayon-flow-sync",
 ]
 
+TOOL_REPOSITORIES = [
+    "ayon-tool-animbot",
+    "ayon-tool-mgear4",
+    "ayon-tool-quixel",
+    "ayon-tool-studiolibrary",
+    "ayon-tool-unpipe",
+]
+
 ROOT_PATH = pathlib.Path(__file__).parent.resolve()
 
 
@@ -28,6 +36,8 @@ def get_repositories():
         get_repository(repository_name, "repos/")
     for repository_name in ADDON_REPOSITORIES:
         get_repository(repository_name, "addons/")
+    for repository_name in TOOL_REPOSITORIES:
+        get_repository(repository_name, "tools/")
 
 
 def get_repository(repository_name, path):
