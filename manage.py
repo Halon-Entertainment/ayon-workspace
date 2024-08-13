@@ -2,6 +2,8 @@ import pathlib
 import subprocess
 import toml
 import click
+import os
+import shlex
 
 
 ROOT_PATH = pathlib.Path(__file__).parent.resolve()
@@ -31,6 +33,15 @@ def get_repositories():
             path = ROOT_PATH / category / name
             get_repository(name, path, url)
 
+@cli.command(name="init-docker", help="Initializes the ayon docker server with an admin user and services user.")
+def init_docker():
+    docker_path = ROOT_PATH / "repos/ayon-docker"
+    os.chdir(docker_path)
+    subprocess.call("docker compose up -d", shell=True)
+    manage_path = docker_path / "manage.ps1"
+    subprocess.call(shlex.split(f"powershell.exe {manage_path.as_posix()} setup"), shell=True)
+
+@cli.command("create-env", help="Create .env files in repositiories that require them")
 
 if __name__ == "__main__":
     cli()
