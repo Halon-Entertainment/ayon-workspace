@@ -1,53 +1,28 @@
 import pathlib
 import subprocess
+import toml
 
-GIT_URL = "https://github.com/Halon-Entertainment/"
-
-CORE_REPOSITORIES = [
-    "ayon-docker",
-    "ayon-frontend",
-    "ayon-backend",
-    "ayon-dependencies-tool",
-    "ayon-python-api",
-    "ayon-launcher",
-]
-
-ADDON_REPOSITORIES = [
-    "ayon-core",
-    "ayon-maya-toolkit",
-    "ayon-webhook",
-    "ayon-zbrush",
-    "ayon-flow-sync",
-]
-
-TOOL_REPOSITORIES = [
-    "ayon-tool-animbot",
-    "ayon-tool-mgear4",
-    "ayon-tool-quixel",
-    "ayon-tool-studiolibrary",
-    "ayon-tool-unpipe",
-]
 
 ROOT_PATH = pathlib.Path(__file__).parent.resolve()
+project_data = toml.load(ROOT_PATH / "pyproject.toml")
+
 
 
 def get_repositories():
-    for repository_name in CORE_REPOSITORIES:
-        get_repository(repository_name, "repos/")
-    for repository_name in ADDON_REPOSITORIES:
-        get_repository(repository_name, "addons/")
-    for repository_name in TOOL_REPOSITORIES:
-        get_repository(repository_name, "tools/")
+    for category, data in project_data["tool"]["ayon-workspace"]["git"].items():
+        if category == "docker":
+            category = "repos/ayon-docker"
+        for name, url in data.items():
+            path = ROOT_PATH / category / name
+            get_repository(name, path, url)
 
-
-def get_repository(repository_name, path):
-    full_path = ROOT_PATH / path / repository_name
-    if full_path.exists():
+def get_repository(repository_name, path, repo_url):
+    if path.exists():
         print(f"Repository {repository_name} already exists")
         return
-    full_path.parent.mkdir(parents=True, exist_ok=True)
+    path.parent.mkdir(parents=True, exist_ok=True)
 
-    git_command = f"git clone {GIT_URL}{repository_name}.git {full_path.as_posix()}"
+    git_command = f"git clone --recursive {repo_url} {path.as_posix()}"
     subprocess.call(git_command, shell=True)
 
 
