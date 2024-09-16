@@ -1,4 +1,5 @@
 import pathlib
+import platform
 import subprocess
 import toml
 import click
@@ -16,7 +17,7 @@ def get_repository(repository_name, path, repo_url):
         return
     path.parent.mkdir(parents=True, exist_ok=True)
 
-    git_command = f"git clone --recursive {repo_url} {path.as_posix()}"
+    git_command = f"git clone --recurse-submodules --recursive {repo_url} {path.as_posix()}"
     subprocess.call(git_command, shell=True)
 
 
@@ -39,9 +40,17 @@ def init_docker():
     os.chdir(docker_path)
     subprocess.call("docker compose up -d", shell=True)
     manage_path = docker_path / "manage.ps1"
-    subprocess.call(shlex.split(f"powershell.exe {manage_path.as_posix()} setup"), shell=True)
+    if platform.uname().system.lower() == 'windows':
+        subprocess.call(shlex.split(f'pwsh -Command "{manage_path.as_posix()}" setup'), shell=False)
+    elif platform.uname().system.lower() in ['linux', 'darwin']:
+        subprocess.call(shlex.split('make setup'), shell=False)
+    subprocess.call("docker compose down", shell=True)
 
-@cli.command("create-env", help="Create .env files in repositiories that require them")
+@cli.command(name="start-docker", help="Starts the ayon docker container")
+def start_docker():
+    docker_path = ROOT_PATH / "repos/ayon-docker"
+    os.chdir(docker_path)
+    subprocess.call("docker compose up -d", shell=True)
 
 if __name__ == "__main__":
     cli()
