@@ -11,6 +11,24 @@ ROOT_PATH = pathlib.Path(__file__).parent.resolve()
 project_data = toml.load(ROOT_PATH / "pyproject.toml")
 
 
+def switch_branch(path):
+    branch = project_data["tool"]["branch-strategy"]["branch"]
+    os.chdir(path)
+    local_branch = subprocess.run(f"git branch --list {branch}", shell=True, capture_output=True, text=True)
+    remote_branch = subprocess.run(f"git ls-remote --heads origin {branch}", shell=True, capture_output=True, text=True)
+
+    if local_branch.stdout.strip() == "" and remote_branch.stdout.strip() == "":
+        print(f"Branch '{branch}' doesn't exist. Creating and pushing it.")
+        subprocess.call(f"git checkout -b {branch}", shell=True)
+        subprocess.call(f"git push -u origin {branch}", shell=True)
+    else:
+        print(f"Switching to existing branch '{branch}' and pulling latest changes.")
+        subprocess.call(f"git checkout {branch}", shell=True)
+        subprocess.call(f"git pull origin {branch}", shell=True)
+
+    subprocess.call("git submodule update --init --recursive", shell=True)
+
+
 def get_repository(repository_name, path, repo_url):
     if path.exists():
         print(f"Repository {repository_name} already exists")
@@ -19,6 +37,8 @@ def get_repository(repository_name, path, repo_url):
 
     git_command = f"git clone --recurse-submodules --recursive {repo_url} {path.as_posix()}"
     subprocess.call(git_command, shell=True)
+
+    switch_branch(path)
 
 
 @click.group()

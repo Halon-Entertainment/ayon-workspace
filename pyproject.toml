@@ -111,6 +111,9 @@ quiet-level = 3
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
 
+[tool.branch-strategy]
+branch = 'Halon/main'
+
 [tool.ayon-workspace.git.repos]
 ayon-docker= "https://github.com/Halon-Entertainment/ayon-docker.git"
 ayon-dependencies-tool= "https://github.com/Halon-Entertainment/ayon-dependencies-tool.git"
