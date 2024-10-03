@@ -88,7 +88,7 @@ def start_docker():
 @cli.command(name="create-addon", help="Creates a new addon in the addons folder.")
 def create_addon():
     addon_name = input("What is the name of your addon?:")
-    match = re.match("^[a-z]+(-[a-z]+)*$", addon_name)
+    match = re.match("^(\w+-?)+\w+$", addon_name)
     while not match:
         print("Invaild Name Try again.")
         addon_name = input("What is the name of your addon?:")
