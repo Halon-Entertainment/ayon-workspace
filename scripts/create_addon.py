@@ -3,6 +3,7 @@ import shutil
 
 import click
 import jinja2
+import subprocess
 
 ADDON_LOCATION: pathlib.Path = pathlib.Path(__file__).parent.parent / "addons"
 ADDON_RESOURCES: pathlib.Path = pathlib.Path(__file__).parent / "addon-resources"
@@ -99,6 +100,8 @@ def create_addon(addon_name: str):
     server_folder = addon_folder / "server"
     server_folder.mkdir(exist_ok=True, parents=True)
     populate_server_folder(server_folder, addon_name)
+
+    subprocess.run(['git', 'init'], check=False, cwd=addon_folder)
 
 
 @click.command()
