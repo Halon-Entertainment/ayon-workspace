@@ -1,9 +1,9 @@
 import pathlib
 import shutil
+import subprocess
 
 import click
 import jinja2
-import subprocess
 
 ADDON_LOCATION: pathlib.Path = pathlib.Path(__file__).parent.parent / "addons"
 ADDON_RESOURCES: pathlib.Path = pathlib.Path(__file__).parent / "addon-resources"
@@ -17,7 +17,7 @@ def get_addon_class_name(addon_name: str) -> str:
 
 
 def populate_client_folder(client_folder: pathlib.Path, addon_name: str):
-    addon_module_folder = client_folder / addon_name
+    addon_module_folder = client_folder / addon_name.replace('-', '_')
     addon_module_folder.mkdir(exist_ok=True, parents=True)
     (addon_module_folder / "pyproject.toml").touch()
 
@@ -61,7 +61,9 @@ def populate_client_folder(client_folder: pathlib.Path, addon_name: str):
 
 def populate_server_folder(server_folder: pathlib.Path, addon_name: str):
     server_init_template_file = ADDON_RESOURCES / "server/__init__.jinja2"
-    server_init_template = jinja2.Template(open(server_init_template_file, encoding="utf-8").read())
+    server_init_template = jinja2.Template(
+        open(server_init_template_file, encoding="utf-8").read()
+    )
     addon_class_name = get_addon_class_name(addon_name)
     with open(server_folder / "__init__.py", "w") as _file:
         _ = _file.write(
@@ -71,8 +73,7 @@ def populate_server_folder(server_folder: pathlib.Path, addon_name: str):
         )
 
 
-
-def create_addon(addon_name: str):
+def create_addon(addon_name: str, addon_title: str, addon_description: str = ""):
     addon_folder = ADDON_LOCATION / addon_name
     addon_folder.mkdir(exist_ok=True, parents=True)
 
@@ -80,7 +81,7 @@ def create_addon(addon_name: str):
     toml_template = jinja2.Template(open(toml_template_file, encoding="utf-8").read())
     addon_module_name = addon_name.replace("-", "_")
     addon_class_name = get_addon_class_name(addon_name)
-    with open(addon_folder / "pyproject.toml", "w") as _file:
+    with open(addon_folder / "pyproject.toml", "w", encoding="utf-8") as _file:
         _ = _file.write(
             toml_template.render(
                 addon_name=addon_name,
@@ -89,8 +90,27 @@ def create_addon(addon_name: str):
             )
         )
 
+    package_template_file = ADDON_RESOURCES / "package.jinja2"
+    package_template = jinja2.Template(
+        open(package_template_file, encoding="utf-8").read()
+    )
+    addon_module_name = addon_name.replace("-", "_")
+    addon_class_name = get_addon_class_name(addon_name)
+    with open(addon_folder / "package.py", "w", encoding="utf-8") as _file:
+        _ = _file.write(
+            package_template.render(
+                addon_module_name=addon_module_name,
+                addon_title=addon_title,
+                addon_description=addon_description,
+            )
+        )
+
     shutil.copy(ADDON_RESOURCES / ".gitignore", addon_folder / ".gitignore")
     shutil.copy(ADDON_RESOURCES / "ruff.toml", addon_folder / "ruff.toml")
+    shutil.copy(
+        ADDON_RESOURCES / "create_package.py",
+        addon_folder / "create_package.py",
+    )
 
     client_folder = addon_folder / "client"
     client_folder.mkdir(exist_ok=True, parents=True)
@@ -101,13 +121,15 @@ def create_addon(addon_name: str):
     server_folder.mkdir(exist_ok=True, parents=True)
     populate_server_folder(server_folder, addon_name)
 
-    subprocess.run(['git', 'init'], check=False, cwd=addon_folder)
+    _ = subprocess.run(["git", "init"], check=False, cwd=addon_folder)
 
 
 @click.command()
 @click.argument("addon-name")
-def cli(addon_name):
-    create_addon(addon_name)
+@click.argument("addon-title")
+@click.argument("addon-description")
+def cli(addon_name: str, addon_title: str, addon_description: str):
+    create_addon(addon_name, addon_title, addon_description)
 
 
 if __name__ == "__main__":

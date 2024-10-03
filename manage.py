@@ -87,25 +87,25 @@ def start_docker():
 
 @cli.command(name="create-addon", help="Creates a new addon in the addons folder.")
 def create_addon():
-    addon_name = input("What is the name of your addon?:")
+    addon_name = input("Enter a name for the addon using dashes to seperate word\n")
     match = re.match("^(\w+-?)+\w+$", addon_name)
     while not match:
         print("Invaild Name Try again.")
-        addon_name = input("What is the name of your addon?:")
+        addon_name = input("Enter a name for the addon using dashes to seperate word\n")
         match = re.match("^[a-z]+(-[a-z]+)*$", addon_name)
 
-    print("Running addon creator")
+    addon_title = input("Enter a title for the addon (i.e 'Ayon Maya'\n")
+    addon_decription = input("Describe the addon\n")
+
+
     script_path = SCRIPTS_FOLDER / "create_addon.py"
     check = subprocess.run(
-        [sys.executable, script_path, addon_name],
+        [sys.executable, script_path, addon_name, addon_title, addon_decription],
         check=True,
         capture_output=True,
     )
-    print(check.returncode)
     if check.returncode > 0:
         raise RuntimeError("Failed to create addon")
-    print(check.stdout.decode('utf-8'))
-    print(check.stderr.decode('utf-8'))
 
 
 if __name__ == "__main__":
