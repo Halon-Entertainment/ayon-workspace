@@ -107,6 +107,7 @@ def create_addon(addon_name: str, addon_title: str, addon_description: str = "")
 
     shutil.copy(ADDON_RESOURCES / ".gitignore", addon_folder / ".gitignore")
     shutil.copy(ADDON_RESOURCES / "ruff.toml", addon_folder / "ruff.toml")
+    shutil.copy(ADDON_RESOURCES / "ruff.toml", addon_folder / "poetry.toml")
     shutil.copy(
         ADDON_RESOURCES / "create_package.py",
         addon_folder / "create_package.py",
