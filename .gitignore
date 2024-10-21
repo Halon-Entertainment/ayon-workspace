@@ -93,3 +93,4 @@ dump.sql
 mypy.ini
 
 .github_changelog_generator
+repositories.json

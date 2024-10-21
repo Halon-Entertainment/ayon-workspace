@@ -7,15 +7,23 @@ import subprocess
 import sys
 
 import click
-import toml
+import json
 
 ROOT_PATH = pathlib.Path(__file__).parent.resolve()
 SCRIPTS_FOLDER = ROOT_PATH / "scripts"
-project_data = toml.load(ROOT_PATH / "pyproject.toml")
+repositiories_json_file = ROOT_PATH / "repositiories.json"
+if not repositiories_json_file.exists():
+    raise FileNotFoundError(("You must have a repositiories.json file "
+                             "in your root directory."
+                             ))
+project_data = json.load(repositiories_json_file.as_posix())
 
 
 def switch_branch(path):
-    branch = project_data["tool"]["branch-strategy"]["branch"]
+    branch = project_data["repositiory-settings"]["default-branch"]
+    if not branch:
+        return
+
     os.chdir(path)
     local_branch = subprocess.run(f"git branch --list {branch}", shell=True, capture_output=True, text=True)
     remote_branch = subprocess.run(f"git ls-remote --heads origin {branch}", shell=True, capture_output=True, text=True)
@@ -51,7 +59,7 @@ def cli():
 
 @cli.command(help="Pulls all configured repositiories, see pyproject.toml.")
 def get_repositories():
-    for category, data in project_data["tool"]["ayon-workspace"]["git"].items():
+    for category, data in project_data['repositories'].items():
         if category == "docker":
             category = "repos/ayon-docker"
         for name, url in data.items():
