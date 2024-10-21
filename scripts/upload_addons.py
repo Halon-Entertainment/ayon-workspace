@@ -43,10 +43,10 @@ def create_package(addon_name: str):
     cmd = f'poetry install && poetry env use python && python ./create_package.py'
     subprocess.run(cmd, cwd=addon_folder.as_posix(), shell=True)
 
-@click.command(name='upload-addons')
+@click.command(name='upload-addons', help='Creates packages and uploads them to the server configured in the .env file.')
 @click.argument('addons', default=[])
 @click.option('-a', '--all-addons', is_flag=True, default=False)
-def cli(addons, all_addons=False):
+def upload_addons_cli(addons, all_addons=False):
     if not all_addons:
         vaild_addons = set([x.name for x in ADDONS_FOLDER.iterdir() if x.is_dir()])
         addons_set = set(addons)
@@ -65,4 +65,4 @@ def cli(addons, all_addons=False):
     upload_addons(addons)
 
 if __name__ == '__main__':
-    cli()
+    upload_addons_cli()

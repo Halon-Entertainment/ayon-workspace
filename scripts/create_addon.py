@@ -125,13 +125,26 @@ def create_addon(addon_name: str, addon_title: str, addon_description: str = "")
     _ = subprocess.run(["git", "init"], check=False, cwd=addon_folder)
 
 
-@click.command()
+@click.command('create-addon', help='Creates a new addon from template.')
 @click.argument("addon-name")
 @click.argument("addon-title")
 @click.argument("addon-description")
-def cli(addon_name: str, addon_title: str, addon_description: str):
+def create_addon_cli(addon_name: str, addon_title: str, addon_description: str):
+    addon_name = input(
+        "Enter a name for the addon using dashes to seperate word\n"
+    )
+    match = re.match("^(\w+-?)+\w+$", addon_name)
+    while not match:
+        print("Invaild Name Try again.")
+        addon_name = input(
+            "Enter a name for the addon using dashes to seperate word\n"
+        )
+        match = re.match("^[a-z]+(-[a-z]+)*$", addon_name)
+
+    addon_title = input("Enter a title for the addon (i.e 'Ayon Maya'\n")
+    addon_description = input("Describe the addon\n")
     create_addon(addon_name, addon_title, addon_description)
 
 
 if __name__ == "__main__":
-    cli()
+    create_addon_cli()
