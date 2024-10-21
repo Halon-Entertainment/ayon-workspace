@@ -12,11 +12,6 @@ import json
 ROOT_PATH = pathlib.Path(__file__).parent.resolve()
 SCRIPTS_FOLDER = ROOT_PATH / "scripts"
 repositiories_json_file = ROOT_PATH / "repositiories.json"
-if not repositiories_json_file.exists():
-    raise FileNotFoundError(("You must have a repositiories.json file "
-                             "in your root directory."
-                             ))
-project_data = json.load(repositiories_json_file.as_posix())
 
 
 def switch_branch(path):
@@ -59,6 +54,7 @@ def cli():
 
 @cli.command(help="Pulls all configured repositiories, see pyproject.toml.")
 def get_repositories():
+    project_data = json.load(repositiories_json_file.as_posix())
     for category, data in project_data['repositories'].items():
         if category == "docker":
             category = "repos/ayon-docker"
@@ -73,6 +69,10 @@ def get_repositories():
 )
 def init_docker():
     docker_path = ROOT_PATH / "repos/ayon-docker"
+    if not repositiories_json_file.exists():
+        raise FileNotFoundError(("You must have a repositiories.json file "
+                                "in your root directory."
+                                ))
     os.chdir(docker_path)
     subprocess.call("docker compose up -d", shell=True)
     manage_path = docker_path / "manage.ps1"
@@ -88,6 +88,11 @@ def init_docker():
 
 @cli.command(name="start-docker", help="Starts the ayon docker container")
 def start_docker():
+    if not repositiories_json_file.exists():
+        raise FileNotFoundError(("You must have a repositiories.json file "
+                                "in your root directory."
+                                ))
+
     docker_path = ROOT_PATH / "repos/ayon-docker"
     os.chdir(docker_path)
     subprocess.call("docker compose up -d", shell=True)
@@ -95,6 +100,10 @@ def start_docker():
 
 @cli.command(name="create-addon", help="Creates a new addon in the addons folder.")
 def create_addon():
+    if not repositiories_json_file.exists():
+        raise FileNotFoundError(("You must have a repositiories.json file "
+                                "in your root directory."
+                                ))
     addon_name = input("Enter a name for the addon using dashes to seperate word\n")
     match = re.match("^(\w+-?)+\w+$", addon_name)
     while not match:
