@@ -12,7 +12,7 @@ import click
 ROOT_PATH = pathlib.Path(__file__).parent.resolve()
 SCRIPTS_FOLDER = ROOT_PATH / "scripts"
 sys.path.insert(0, SCRIPTS_FOLDER.as_posix())
-repositiories_json_file = ROOT_PATH / "repositiories.json"
+repositiories_json_file = ROOT_PATH / "repositories.json"
 
 import upload_addons
 import create_addon
@@ -20,7 +20,9 @@ import create_addon
 
 
 def switch_branch(path):
-    branch = project_data["repositiory-settings"]["default-branch"]
+    with open(repositiories_json_file.as_posix(), 'r', encoding='utf-8') as config_file:
+        project_data = json.load(config_file)
+    branch = project_data["repository-settings"]["default-branch"]
     if not branch:
         return
 
