@@ -74,7 +74,8 @@ def cli():
 
 @cli.command(help="Pulls all configured repositiories, see pyproject.toml.")
 def get_repositories():
-    project_data = json.load(repositiories_json_file.as_posix())
+    with open(repositiories_json_file.as_posix(), 'r', encoding='utf-8') as config_file:
+        project_data = json.load(config_file)
     for category, data in project_data["repositories"].items():
         if category == "docker":
             category = "repos/ayon-docker"
