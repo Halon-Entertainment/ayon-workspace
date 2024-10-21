@@ -1,7 +1,6 @@
 {
-  "repository-settings":
-  {
-    "default-branch": null,
+  "repository-settings": {
+    "default-branch": null
   },
   "repositories": {
     "repos": {
@@ -13,10 +12,9 @@
     "addons": {
       "ayon-core": "https://github.com/Ynput/ayon-core.git",
       "ayon-applications": "https://github.com/Ynput/ayon-applications.git",
-      "ayon-maya": "https://github.com/Ynput/ayon-maya.git",
+      "ayon-maya": "https://github.com/Ynput/ayon-maya.git"
     },
-    "tools": {
-    },
+    "tools": {},
     "docker": {
       "frontend": "https://github.com/Ynput/ayon-frontend.git",
       "backend": "https://github.com/Ynput/ayon-backend.git"
