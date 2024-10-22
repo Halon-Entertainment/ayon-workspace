@@ -119,30 +119,3 @@ quiet-level = 3
 [build-system]
 requires = ["poetry-core"]
 build-backend = "poetry.core.masonry.api"
-
-[tool.branch-strategy]
-branch = 'Halon/main'
-
-[tool.ayon-workspace.git.repos]
-ayon-docker= "https://github.com/Halon-Entertainment/ayon-docker.git"
-ayon-dependencies-tool= "https://github.com/Halon-Entertainment/ayon-dependencies-tool.git"
-ayon-python-api= "https://github.com/Halon-Entertainment/ayon-python-api.git"
-ayon-launcher= "https://github.com/Halon-Entertainment/ayon-launcher.git"
-
-[tool.ayon-workspace.git.addons]
-ayon-core= "https://github.com/Halon-Entertainment/ayon-core.git"
-ayon-maya-toolkit= "https://github.com/Halon-Entertainment/ayon-maya-toolkit.git"
-ayon-webhook= "https://github.com/Halon-Entertainment/ayon-webhook.git"
-ayon-zbrush= "https://github.com/Halon-Entertainment/ayon-zbrush.git"
-ayon-flow-sync= "https://github.com/Halon-Entertainment/ayon-flow-sync.git"
-
-[tool.ayon-workspace.git.tools]
-ayon-tool-animbot= "https://github.com/Halon-Entertainment/ayon-tool-animbot.git"
-ayon-tool-mgear4= "https://github.com/Halon-Entertainment/ayon-tool-mgear4.git"
-ayon-tool-quixel= "https://github.com/Halon-Entertainment/ayon-tool-quixel.git"
-ayon-tool-studiolibrary= "https://github.com/Halon-Entertainment/ayon-tool-studiolibrary.git"
-ayon-tool-unpipe= "https://github.com/Halon-Entertainment/ayon-tool-unpipe.git"
-
-[tool.ayon-workspace.git.docker]
-frontend= "https://github.com/Halon-Entertainment/ayon-frontend.git"
-backend= "https://github.com/Halon-Entertainment/ayon-backend.git"
