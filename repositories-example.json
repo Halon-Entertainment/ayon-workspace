@@ -1,7 +1,4 @@
 {
-  "repository-settings": {
-    "default-branch": null
-  },
   "repositories": {
     "repos": {
       "ayon-docker": "https://github.com/Ynput/ayon-docker.git",

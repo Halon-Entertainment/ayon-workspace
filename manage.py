@@ -19,42 +19,6 @@ import create_addon
 
 
 
-def switch_branch(path):
-    with open(repositiories_json_file.as_posix(), 'r', encoding='utf-8') as config_file:
-        project_data = json.load(config_file)
-    branch = project_data["repository-settings"]["default-branch"]
-    if not branch:
-        return
-
-    os.chdir(path)
-    local_branch = subprocess.run(
-        f"git branch --list {branch}",
-        shell=True,
-        capture_output=True,
-        text=True,
-    )
-    remote_branch = subprocess.run(
-        f"git ls-remote --heads origin {branch}",
-        shell=True,
-        capture_output=True,
-        text=True,
-    )
-
-    if (
-        local_branch.stdout.strip() == ""
-        and remote_branch.stdout.strip() == ""
-    ):
-        print(f"Branch '{branch}' doesn't exist. Creating and pushing it.")
-        subprocess.call(f"git checkout -b {branch}", shell=True)
-        subprocess.call(f"git push -u origin {branch}", shell=True)
-    else:
-        print(
-            f"Switching to existing branch '{branch}' and pulling latest changes."
-        )
-        subprocess.call(f"git checkout {branch}", shell=True)
-        subprocess.call(f"git pull origin {branch}", shell=True)
-
-    subprocess.call("git submodule update --init --recursive", shell=True)
 
 
 def get_repository(repository_name, path, repo_url):

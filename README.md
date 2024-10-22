@@ -47,10 +47,6 @@ this folder will be in a standard Ayon addon package structure.
 You can edit `repositories.json` to fit your development needs. Repositiries can come from the official [Ynput](https://github.com/ynput) repositories
 or your own folked repositories.
 
-`repository-settings`
-- `default-branch` - the default-branch that will be checked out on clone. the default is null and will checkout the default branch from the repository.
-
-
 ## `./manage.py`
 
 manage.py is meant as an interface to make some of the Ayon task a little easier, and make startup for new developer easier to manage.
