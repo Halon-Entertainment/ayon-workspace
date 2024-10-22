@@ -7,23 +7,25 @@ ___
 
 The goal of this project is to create automations that assist in the development and 
 maintainance for Ayon. It is a standardized development workspace and location to house
-developer focus scripts and automations.
+developer focused scripts and automations.
 
 
 
 ## Requirements
 
-- Python Poetry
+- [Python Poetry](https://python-poetry.org/)
 
 ### Recommended
 
-- PyEnv
+PyEnv 
+- [Windows](https://pyenv-win.github.io/pyenv-win/)
+- [Mac or Linux](https://github.com/pyenv/pyenv)
 
 
 ## Setup
 
- - Clone this repository to your local development area.
- - For command line run `poetry install`.
+ - Clone this repository to your local development area. `git clone https://github.com/Halon-Entertainment/ayon-workspace.git`
+ - From command line run `poetry install`.
  - open the poetry shell `poetry shell`.
  - copy and rename `./repositories-example.json` to `./repositories.json`.
  - run `python ./manage.py get-reposities`.
@@ -42,8 +44,10 @@ this folder will be in a standard Ayon addon package structure.
 - `repo` - This holds common repositories outside of the addon eco system. (i.e: ayon-dependencies-tool, ayon-docker, ayon-python-api)
 - `docker` - This is a specical key specifically setup for repositories that typically run from within the ayon-docker container.
 
-`repository-settings`
+You can edit `repositories.json` to fit your development needs. Repositiries can come from the official [Ynput](https://github.com/ynput) repositories
+or your own folked repositories.
 
+`repository-settings`
 - `default-branch` - the default-branch that will be checked out on clone. the default is null and will checkout the default branch from the repository.
 
 
