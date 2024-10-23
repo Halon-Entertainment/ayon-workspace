@@ -52,7 +52,8 @@ def create_packages(addons):
 @click.argument('addons', nargs=-1)
 @click.option('-a', '--all-addons', is_flag=True, default=False)
 @click.option('-c', '--create-package-only', is_flag=True, default=False)
-def upload_addons_cli(addons, all_addons=False, create_package_only=False):
+@click.option('-r', '--restart-server', is_flag=True, default=False)
+def upload_addons_cli(addons, all_addons=False, create_package_only=False, restart_server=False):
     if not all_addons:
         vaild_addons = set([x.name for x in ADDONS_FOLDER.iterdir() if x.is_dir()])
         addons_set = set(addons)
@@ -72,6 +73,10 @@ def upload_addons_cli(addons, all_addons=False, create_package_only=False):
         upload_addons(addons)
     else:
         create_packages(addons)
+
+    if restart_server:
+        ayon_api.trigger_server_restart()
+
 
 if __name__ == '__main__':
     upload_addons_cli()
