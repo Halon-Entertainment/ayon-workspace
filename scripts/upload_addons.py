@@ -14,11 +14,11 @@ def upload_addon(addon_name: str):
     name, version = read_package(addon_name)
     addon_folder = ADDONS_FOLDER / addon_name
     expected_zip = addon_folder / f"package/{name}-{version}.zip"
+    create_package(addon_name)
     if not expected_zip.exists():
         raise FileNotFoundError(
             f"{expected_zip.name} Not found, run create package."
         )
-    create_package(addon_name)
     ayon_api.upload_addon_zip(expected_zip)
 
 
@@ -46,8 +46,16 @@ def read_package(addon_name: str) -> tuple[str, str]:
 
 def create_package(addon_name: str):
     addon_folder = ADDONS_FOLDER / addon_name
-    cmd = f"poetry install && poetry env use python && python ./create_package.py"
-    subprocess.run(cmd, cwd=addon_folder.as_posix(), shell=True)
+    pyproject_file = addon_folder / '.pyproject.toml'
+    if pyproject_file.exists():
+        cmd = f"poetry install && poetry env use python && python ./create_package.py"
+    else:
+        cmd = f"python ./create_package.py"
+    result = subprocess.run(cmd, cwd=addon_folder.as_posix(), shell=True, capture_output=True)
+    print(result)
+    if result.returncode != 0:
+        raise RuntimeError(f"Unable to Create package for {addon_name}\n{result.stderr}")
+    
     print(f"Package Created: {addon_folder.as_posix()}")
 
 
@@ -82,6 +90,8 @@ def upload_addons_cli(
             raise ValueError(message)
     else:
         addons = [x.name for x in ADDONS_FOLDER.iterdir() if x.is_dir()]
+
+    print(addons)
 
     if not create_package_only:
         upload_addons(addons)
