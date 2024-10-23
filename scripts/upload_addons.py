@@ -52,7 +52,6 @@ def create_package(addon_name: str):
     else:
         cmd = f"python ./create_package.py"
     result = subprocess.run(cmd, cwd=addon_folder.as_posix(), shell=True, capture_output=True)
-    print(result)
     if result.returncode != 0:
         raise RuntimeError(f"Unable to Create package for {addon_name}\n{result.stderr}")
     
@@ -90,8 +89,6 @@ def upload_addons_cli(
             raise ValueError(message)
     else:
         addons = [x.name for x in ADDONS_FOLDER.iterdir() if x.is_dir()]
-
-    print(addons)
 
     if not create_package_only:
         upload_addons(addons)
