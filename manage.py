@@ -30,8 +30,6 @@ def get_repository(repository_name, path, repo_url):
     git_command = f"git clone --recursive {repo_url} {path.as_posix()}"
     subprocess.call(git_command, shell=True)
 
-    switch_branch(path)
-
 
 @click.group()
 def cli():

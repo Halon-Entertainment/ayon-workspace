@@ -14,7 +14,7 @@ toml = "^0.10.2"
 appdirs = "^1.4.4"
 jinja2 = "^3.1.4"
 python-dotenv = "^1.0.1"
-ayon-python-api = "1.0.1"
+ayon-python-api = "^1.0.10"
 poetry = "^1.8.4"
 
 
@@ -22,7 +22,6 @@ poetry = "^1.8.4"
 # test dependencies
 pytest = "^8.0"
 pytest-print = "^1.0"
-ayon-python-api = "^1.0"
 # linting dependencies
 ruff = "^0.3.3"
 pre-commit = "^3.6.2"
