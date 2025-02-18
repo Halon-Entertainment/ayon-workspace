@@ -28,7 +28,7 @@ PyEnv
  - From command line run `poetry install`.
  - open the poetry shell `poetry shell`.
  - copy and rename `./repositories-example.json` to `./repositories.json`.
- - run `python ./manage.py get-reposities`.
+ - run `python ./manage.py get-repositories`.
 
  This will clone all repositories to their designated folders with in the workspace.
 
