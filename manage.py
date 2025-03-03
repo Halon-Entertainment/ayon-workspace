@@ -6,8 +6,10 @@ import re
 import shlex
 import subprocess
 import sys
-
+import toml
 import click
+import tempfile
+
 
 ROOT_PATH = pathlib.Path(__file__).parent.resolve()
 SCRIPTS_FOLDER = ROOT_PATH / "scripts"
@@ -18,7 +20,140 @@ import upload_addons
 import create_addon
 
 
+@click.group()
+def cli():
+    pass
 
+
+@click.command(name="release", help="Builds a release for each addon.")
+@click.option("--bump-version", is_flag=True, help="Bump version in pyproject.toml before building.")
+@click.option("--upload-release", is_flag=True, help="Upload release to GitHub after building.")
+@click.option("--addon-name", is_flag=True, help="Define which addon to release.")
+def build_releases(bump_version, upload_release, addon_name):
+    with open(repositiories_json_file.as_posix(), 'r', encoding='utf-8') as config_file:
+        project_data = json.load(config_file)
+
+    for organisation, branch in project_data["release_builder"]["organisations"].items():
+        print(f"Processing organisation: {organisation}")
+        for name, url in project_data["repositories"]["addons"].items():
+            if addon_name and name != addon_name:
+                continue
+
+            print(f"Processing addon: {name}")
+            if re.search(r"https://github\.com/" + organisation, url):
+                path = ROOT_PATH / "addons" / name
+                if not path.exists():
+                    get_repository(name, path, url)
+
+                os.chdir(path)
+                subprocess.call(f"git switch {branch}", shell=True)
+                subprocess.call("git pull", shell=True)
+
+                pyproject_file = path / "pyproject.toml"
+                if bump_version and pyproject_file.exists():
+                    version = bump_version_in_pyproject(pyproject_file)
+                    update_version_in_package(path, version)
+                else:
+                    version = get_current_version(pyproject_file)
+
+                create_package_path = path / "create_package.py"
+                if create_package_path.exists():
+                    subprocess.call(f"python {create_package_path.as_posix()}", shell=True)
+
+                if upload_release:
+                    name = get_addon_name(pyproject_file)
+                    upload_release_to_github(name, version, name, path)
+
+
+def bump_version_in_pyproject(pyproject_file):
+    with open(pyproject_file, "r", encoding="utf-8") as f:
+        data = toml.load(f)
+
+    version = data["tool"]["poetry"]["version"]
+    major, minor, patch = map(int, version.split("."))
+    new_version = f"{major}.{minor}.{patch + 1}"
+    data["tool"]["poetry"]["version"] = new_version
+
+    with open(pyproject_file, "w", encoding="utf-8") as f:
+        toml.dump(data, f)
+
+    print(f"Bumped version to {new_version}")
+    return new_version
+
+
+def get_current_version(pyproject_file):
+    with open(pyproject_file, "r", encoding="utf-8") as f:
+        data = toml.load(f)
+    return data["tool"]["poetry"]["version"]
+
+
+def get_addon_name(pyproject_file):
+    with open(pyproject_file, "r", encoding="utf-8") as f:
+        data = toml.load(f)
+    return data["tool"]["poetry"]["name"]
+
+
+def update_version_in_package(package_path, version):
+    package_file = package_path / "package.py"
+
+    if package_file.exists():
+        with open(package_file, "r", encoding="utf-8") as f:
+            content = f.read()
+
+        new_content = re.sub(r'(?<=version = ")(\d+\.\d+\.\d+)', version, content)
+
+        with open(package_file, "w", encoding="utf-8") as f:
+            f.write(new_content)
+
+        print(f"Updated version in package.py to {version}")
+    else:
+        print(f"package.py not found in {package_path}")
+
+
+def upload_release_to_github(repo_name, version, name, repo_path):
+    print(f"Uploading {repo_name} v{version} to GitHub...")
+    last_tag = get_last_tag(repo_path)
+    tag_name = f"{version}"
+    subprocess.call(f"git tag {tag_name}", shell=True)
+    subprocess.call("git push --tags", shell=True)
+
+    release_notes = f"Release {version} for {repo_name}\n\n"
+    commit_messages = get_commit_messages_since_last_tag(last_tag, repo_path)
+    release_notes += commit_messages
+
+    with tempfile.NamedTemporaryFile(delete=False, mode='w', encoding='utf-8') as temp_file:
+        temp_file.write(release_notes)
+        temp_file_path = temp_file.name
+
+    release_file = repo_path / f"{name}-{version}.zip"
+    if release_file.exists():
+        subprocess.call(
+            f'gh release create {tag_name} {release_file.as_posix()} --title "{repo_name} {version}" --notes-file "{temp_file_path}"',
+            shell=True)
+    else:
+        subprocess.call(f'gh release create {tag_name} --title "{repo_name} {version}" --notes-file "{temp_file_path}"',
+                        shell=True)
+
+    print(f"✅ Release {repo_name} v{version} uploaded to GitHub.")
+
+
+def get_last_tag(repo_path):
+    result = subprocess.run(
+        ["git", "describe", "--tags", "--abbrev=0"], cwd=repo_path, capture_output=True, text=True
+    )
+    return result.stdout.strip()
+
+
+def get_commit_messages_since_last_tag(last_tag, repo_path):
+    result = subprocess.run(
+        ["git", "log", f"{last_tag}..HEAD", "--oneline"], cwd=repo_path, capture_output=True, text=True
+    )
+    commit_messages = result.stdout.strip()
+
+    if commit_messages:
+        return f"### Commits since {last_tag}:\n{commit_messages}"
+    else:
+        return "No new commits since last release."
 
 
 def get_repository(repository_name, path, repo_url):
@@ -29,11 +164,6 @@ def get_repository(repository_name, path, repo_url):
 
     git_command = f"git clone --recursive {repo_url} {path.as_posix()}"
     subprocess.call(git_command, shell=True)
-
-
-@click.group()
-def cli():
-    pass
 
 
 @cli.command(help="Pulls all configured repositiories, see pyproject.toml.")
@@ -91,6 +221,7 @@ def start_docker():
 
 cli.add_command(create_addon.create_addon_cli)
 cli.add_command(upload_addons.upload_addons_cli)
+cli.add_command(build_releases)
 
 if __name__ == "__main__":
     cli()

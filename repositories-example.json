@@ -16,5 +16,10 @@
       "frontend": "https://github.com/Ynput/ayon-frontend.git",
       "backend": "https://github.com/Ynput/ayon-backend.git"
     }
+  },
+  "release_builder": {
+    "organisations": {
+      "Org-Name": "branch"
+    }
   }
 }

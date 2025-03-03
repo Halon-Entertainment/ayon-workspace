@@ -1,5 +1,3 @@
-
-
 [tool.poetry]
 name = "ayon-workspace"
 version = "0.0.1"
